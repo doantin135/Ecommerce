@@ -32,7 +32,7 @@ export const addOrder = async (
 ): Promise<Order> => {
   const user = auth.currentUser;
 
-  // Tạo order local trước
+  
   const newOrder: Order = {
     ...order,
     id: Date.now().toString(),
@@ -40,7 +40,7 @@ export const addOrder = async (
     createdAt: new Date().toISOString(),
   };
 
-  // Lưu lên Laravel
+  
   try {
     const response = await fetchAPI("/orders", "POST", {
       user_id:        user?.uid ?? "guest",
@@ -59,7 +59,7 @@ export const addOrder = async (
         image:      i.image,
       })),
     });
-    newOrder.serverId = response.order?.id; // ← lưu ID từ Laravel
+    newOrder.serverId = response.order?.id; 
   } catch (e) {
     console.log("Lỗi lưu order lên server:", e);
   }

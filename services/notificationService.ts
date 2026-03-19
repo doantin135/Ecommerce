@@ -2,20 +2,19 @@ import * as Notifications from "expo-notifications";
 import * as Device from "expo-device";
 import { Platform } from "react-native";
 
-// Cấu hình hiển thị thông báo
+
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
     shouldShowAlert: true,
     shouldPlaySound: true,
     shouldSetBadge: true,
-    // Add the missing properties below:
-    shouldShowBanner: true, // or false, based on your requirement
-    shouldShowList: true,   // or false, based on your requirement
+    
+    shouldShowBanner: true, 
+    shouldShowList: true,   
   }),
 });
 
 
-// Xin quyền thông báo
 export const registerForPushNotifications = async (): Promise<string | null> => {
   if (!Device.isDevice) {
     console.log("Thông báo chỉ hoạt động trên thiết bị thật");

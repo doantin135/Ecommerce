@@ -42,9 +42,9 @@ export const toggleWishlistItem = async (item: WishlistItem): Promise<boolean> =
     const inList = await isInWishlist(item.id);
     if (inList) {
         await removeFromWishlist(item.id);
-        return false; // đã xóa
+        return false; 
     } else {
         await addToWishlist(item);
-        return true; // đã thêm
+        return true; 
     }
 };

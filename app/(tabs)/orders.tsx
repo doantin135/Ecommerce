@@ -39,11 +39,11 @@ export default function OrdersScreen() {
 
   useFocusEffect(
     useCallback(() => {
-      // Cập nhật trạng thái user mỗi khi vào tab
+      
       const currentUser = auth.currentUser;
       setUser(currentUser);
 
-      // Chỉ load đơn hàng nếu đã đăng nhập
+      
       if (currentUser) {
         getOrders().then(setOrders);
       } else {
@@ -83,7 +83,7 @@ export default function OrdersScreen() {
       setUser(currentUser);
 
       if (currentUser) {
-        // Sync status từ server trước rồi mới load
+        
         syncOrderStatus().then(() => {
           getOrders().then(setOrders);
         });
@@ -93,7 +93,7 @@ export default function OrdersScreen() {
     }, []),
   );
 
-  // Chưa đăng nhập → hiện màn hình yêu cầu đăng nhập
+  
   if (!user) {
     return (
       <View style={styles.root}>
