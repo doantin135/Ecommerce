@@ -1,24 +1,34 @@
-import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
-import { Stack } from 'expo-router';
-import { StatusBar } from 'expo-status-bar';
-import 'react-native-reanimated';
-
-import { useColorScheme } from '@/hooks/use-color-scheme';
-
-export const unstable_settings = {
-  anchor: '(tabs)',
-};
+import { Stack, router } from "expo-router";
+import { useEffect } from "react";
+import { registerForPushNotifications } from "../services/notificationService";
+import * as Notifications from "expo-notifications";
+import { ThemeProvider } from "../context/ThemeContext";
 
 export default function RootLayout() {
-  const colorScheme = useColorScheme();
+  useEffect(() => {
+    registerForPushNotifications();
+
+    const subscription = Notifications.addNotificationResponseReceivedListener(
+      (response) => {
+        const data = response.notification.request.content.data;
+        if (data.type === "order") router.push("/(tabs)/orders");
+        else if (data.type === "promo") router.push("/(tabs)");
+      }
+    );
+    return () => subscription.remove();
+  }, []);
 
   return (
-    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <Stack>
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="modal" options={{ presentation: 'modal', title: 'Modal' }} />
+    <ThemeProvider>
+      <Stack screenOptions={{ headerShown: false }}>
+        <Stack.Screen name="(tabs)" />
+        <Stack.Screen name="Product/[id]" />
+        <Stack.Screen name="Checkout/index" />
+        <Stack.Screen name="OrderSuccess/index" />
+        <Stack.Screen name="Login/index" />
+        <Stack.Screen name="Register/index" />
+        <Stack.Screen name="Wishlist/index" />
       </Stack>
-      <StatusBar style="auto" />
     </ThemeProvider>
   );
 }
