@@ -236,7 +236,7 @@ export default function HomeScreen() {
                       style={styles.cardImg}
                     />
 
-                    {/* ❤️ */}
+                    
                     <TouchableOpacity
                       style={styles.wishBtn}
                       onPress={() => handleWishlist(item)}
@@ -267,7 +267,7 @@ export default function HomeScreen() {
                       {formatPrice(item.price)}
                     </Text>
 
-                    {/* ⭐ */}
+                    
                     <View style={styles.ratingRow}>
                       <Ionicons name="star" size={12} color="#f5a623" />
                       <Text style={{ color: colors.subtext }}>

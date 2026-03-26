@@ -80,7 +80,7 @@ export default function CartScreen() {
 
       {/* Header */}
       <View style={styles.header}>
-        <View style={{ width: 38 }} /> {/* ← thay iconBtn bằng View trống */}
+        <View style={{ width: 38 }} /> 
         <Text style={styles.headerTitle}>Giỏ hàng ({cart.length})</Text>
         {cart.length > 0 ? (
           <TouchableOpacity onPress={handleClear}>

@@ -260,7 +260,7 @@ export default function HomeScreen() {
                       }}
                     />
                     <Text style={styles.cardMeta}>
-                      {item.rating} • Đã bán {item.sold}
+                      {item.rating} Đã bán {item.sold}
                     </Text>
                   </View>
                 </View>
