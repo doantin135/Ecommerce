@@ -17,34 +17,20 @@ import { useTheme } from "../../context/ThemeContext";
 import {
   toggleWishlistItem,
   getWishlist,
-  WishlistItem,
 } from "../../services/wishlistService";
 import { SkeletonBanner, SkeletonGrid } from "../../components/SkeletonLoader";
 
+import { Ionicons } from "@expo/vector-icons";
+
 const { width } = Dimensions.get("window");
-
-type Category = {
-  id: number;
-  label: string;
-};
-
-type Product = {
-  id: number;
-  name: string;
-  price: number;
-  old_price?: number;
-  rating: number;
-  sold: number;
-  image: string;
-  badge?: string;
-};
 
 export default function HomeScreen() {
   const { colors, theme, toggleTheme } = useTheme();
+
   const [search, setSearch] = useState("");
   const [wishlist, setWishlist] = useState<number[]>([]);
-  const [products, setProducts] = useState<Product[]>([]);
-  const [categories, setCategories] = useState<Category[]>([]);
+  const [products, setProducts] = useState<any[]>([]);
+  const [categories, setCategories] = useState<any[]>([]);
   const [activeCategory, setActiveCategory] = useState<number | null>(null);
   const [cartCount, setCartCount] = useState(0);
   const [loading, setLoading] = useState(true);
@@ -52,20 +38,14 @@ export default function HomeScreen() {
   useFocusEffect(
     useCallback(() => {
       getCartCount().then(setCartCount);
+      getWishlist().then((items) =>
+        setWishlist(items.map((i) => i.id)),
+      );
     }, []),
   );
 
   const handleWishlist = async (item: any) => {
-    const added = await toggleWishlistItem({
-      id: item.id,
-      name: item.name,
-      price: item.price,
-      old_price: item.old_price,
-      image: item.image,
-      rating: item.rating,
-      sold: item.sold,
-      badge: item.badge,
-    });
+    const added = await toggleWishlistItem(item);
     if (added) {
       setWishlist((prev) => [...prev, item.id]);
     } else {
@@ -74,19 +54,14 @@ export default function HomeScreen() {
   };
 
   const formatPrice = (price: any) => {
-    if (typeof price === "string") return price;
     return Number(price).toLocaleString("vi-VN") + "₫";
   };
 
   useEffect(() => {
-    categoryAPI
-      .getAll()
-      .then((data: any) => {
-        // Lọc bỏ category có label là "Tất cả"
-        const filtered = data.filter((cat: any) => cat.label !== "Tất cả");
-        setCategories(filtered);
-      })
-      .catch((err: any) => console.log("Category API error:", err));
+    categoryAPI.getAll().then((data: any) => {
+      const filtered = data.filter((c: any) => c.label !== "Tất cả");
+      setCategories(filtered);
+    });
   }, []);
 
   useEffect(() => {
@@ -94,74 +69,60 @@ export default function HomeScreen() {
     productAPI
       .getAll()
       .then((data: any) => {
-        const list = Array.isArray(data) ? data : (data.data ?? []);
-        setProducts(list);
+        setProducts(Array.isArray(data) ? data : data.data);
       })
-      .catch((err: any) => console.log("Product API error:", err))
       .finally(() => setLoading(false));
   }, []);
 
-  useFocusEffect(
-    useCallback(() => {
-      getCartCount().then(setCartCount);
-      getWishlist().then((items) => setWishlist(items.map((i) => i.id)));
-    }, []),
-  );
-
-  const filteredProducts = Array.isArray(products)
-    ? activeCategory === null
+  const filteredProducts =
+    activeCategory === null
       ? products
-      : products.filter((p: any) => p.category_id === activeCategory)
-    : [];
+      : products.filter((p: any) => p.category_id === activeCategory);
+
   return (
     <View style={[styles.root, { backgroundColor: colors.background }]}>
       <StatusBar
         barStyle={theme === "dark" ? "light-content" : "dark-content"}
       />
 
-      {/* Header */}
+      {/* HEADER */}
       <View style={[styles.header, { backgroundColor: colors.header }]}>
         <View>
-          <Text style={[styles.hello, { color: colors.subtext }]}>
-            Xin chào 👋
+          <View style={{ flexDirection: "row", alignItems: "center", gap: 4 }}>
+            <Text style={[styles.hello, { color: colors.subtext }]}>
+              Xin chào
+            </Text>
+            <Ionicons name="hand-left-outline" size={16} color={colors.subtext} />
+          </View>
+
+          <Text style={[styles.brand, { color: colors.text }]}>
+            ShopNow
           </Text>
-          <Text style={[styles.brand, { color: colors.text }]}>ShopNow</Text>
         </View>
 
         <View style={styles.headerActions}>
-          {/* Dark Mode Toggle */}
           <TouchableOpacity
             style={[styles.iconBtn, { backgroundColor: colors.input }]}
             onPress={toggleTheme}
           >
-            <Text style={{ fontSize: 16 }}>
-              {theme === "dark" ? "☀️" : "🌙"}
-            </Text>
-          </TouchableOpacity>
-
-          {/* Thông báo */}
-          <TouchableOpacity
-            style={[styles.iconBtn, { backgroundColor: colors.input }]}
-          >
-            <Image
-              style={[styles.iconImg, { tintColor: colors.text }]}
-              source={{
-                uri: "https://img.icons8.com/ios-filled/100/appointment-reminders.png",
-              }}
+            <Ionicons
+              name={theme === "dark" ? "sunny" : "moon"}
+              size={18}
+              color={colors.text}
             />
           </TouchableOpacity>
 
-          {/* Giỏ hàng */}
+          <TouchableOpacity
+            style={[styles.iconBtn, { backgroundColor: colors.input }]}
+          >
+            <Ionicons name="notifications-outline" size={18} color={colors.text} />
+          </TouchableOpacity>
+
           <TouchableOpacity
             style={[styles.iconBtn, { backgroundColor: colors.input }]}
             onPress={() => router.push("/(tabs)/cart")}
           >
-            <Image
-              style={[styles.iconImg, { tintColor: colors.text }]}
-              source={{
-                uri: "https://img.icons8.com/ios-filled/100/shopping-cart.png",
-              }}
-            />
+            <Ionicons name="cart-outline" size={18} color={colors.text} />
             {cartCount > 0 && (
               <View style={styles.badge}>
                 <Text style={styles.badgeText}>{cartCount}</Text>
@@ -169,33 +130,24 @@ export default function HomeScreen() {
             )}
           </TouchableOpacity>
 
-          {/* User */}
           <TouchableOpacity
             style={[styles.iconBtn, { backgroundColor: colors.input }]}
             onPress={() => router.navigate("/(tabs)/profile")}
           >
-            <Image
-              style={[styles.iconImg, { tintColor: colors.text }]}
-              source={{
-                uri: "https://img.icons8.com/ios-filled/100/user.png",
-              }}
-            />
+            <Ionicons name="person-outline" size={18} color={colors.text} />
           </TouchableOpacity>
         </View>
       </View>
 
       <ScrollView showsVerticalScrollIndicator={false}>
-        {/* Search - luôn hiện */}
+        {/* SEARCH */}
         <View
           style={[
             styles.searchWrap,
-            { backgroundColor: colors.card, borderColor: colors.border },
+            { borderColor: colors.border, backgroundColor: colors.card },
           ]}
         >
-          <Image
-            style={[styles.searchIcon, { tintColor: colors.subtext }]}
-            source={{ uri: "https://img.icons8.com/ios-filled/100/search.png" }}
-          />
+          <Ionicons name="search" size={16} color={colors.subtext} />
           <TextInput
             style={[styles.searchInput, { color: colors.text }]}
             placeholder="Tìm kiếm sản phẩm..."
@@ -212,18 +164,13 @@ export default function HomeScreen() {
           </>
         ) : (
           <>
-            {/* Banner */}
-            <View style={styles.bannerWrap}>
-              <Image
-                source={{ uri: "https://picsum.photos/seed/banner/800/360" }}
-                style={styles.bannerImg}
-              />
-              <View style={styles.bannerContent}>
-                <Text style={styles.bannerTitle}>Giảm đến 50%</Text>
-              </View>
-            </View>
+            {/* BANNER */}
+            <Image
+              source={{ uri: "https://picsum.photos/800/300" }}
+              style={styles.banner}
+            />
 
-            {/* Categories */}
+            {/* CATEGORY */}
             <ScrollView
               horizontal
               showsHorizontalScrollIndicator={false}
@@ -232,7 +179,6 @@ export default function HomeScreen() {
               <TouchableOpacity
                 style={[
                   styles.catChip,
-                  { backgroundColor: colors.card },
                   activeCategory === null && styles.catChipActive,
                 ]}
                 onPress={() => setActiveCategory(null)}
@@ -240,19 +186,18 @@ export default function HomeScreen() {
                 <Text
                   style={[
                     styles.catText,
-                    { color: colors.subtext },
                     activeCategory === null && styles.catTextActive,
                   ]}
                 >
                   Tất cả
                 </Text>
               </TouchableOpacity>
+
               {categories.map((cat) => (
                 <TouchableOpacity
                   key={cat.id}
                   style={[
                     styles.catChip,
-                    { backgroundColor: colors.card },
                     activeCategory === cat.id && styles.catChipActive,
                   ]}
                   onPress={() => setActiveCategory(cat.id)}
@@ -260,7 +205,6 @@ export default function HomeScreen() {
                   <Text
                     style={[
                       styles.catText,
-                      { color: colors.subtext },
                       activeCategory === cat.id && styles.catTextActive,
                     ]}
                   >
@@ -270,24 +214,16 @@ export default function HomeScreen() {
               ))}
             </ScrollView>
 
-            {/* Section Header */}
-            <View style={styles.secHeader}>
-              <Text style={[styles.secTitle, { color: colors.text }]}>
-                Nổi bật
-              </Text>
-            </View>
-
-            {/* Product Grid */}
+            {/* PRODUCTS */}
             <View style={styles.grid}>
               {filteredProducts
-                .filter((item) =>
-                  item.name.toLowerCase().includes(search.toLowerCase()),
+                .filter((p) =>
+                  p.name.toLowerCase().includes(search.toLowerCase()),
                 )
                 .map((item) => (
                   <TouchableOpacity
                     key={item.id}
                     style={[styles.card, { backgroundColor: colors.card }]}
-                    activeOpacity={0.9}
                     onPress={() =>
                       router.push({
                         pathname: "/Product/[id]",
@@ -295,55 +231,47 @@ export default function HomeScreen() {
                       })
                     }
                   >
-                    <View style={styles.cardImgWrap}>
-                      <Image
-                        source={{ uri: item.image }}
-                        style={styles.cardImg}
+                    <Image
+                      source={{ uri: item.image }}
+                      style={styles.cardImg}
+                    />
+
+                    {/* ❤️ */}
+                    <TouchableOpacity
+                      style={styles.wishBtn}
+                      onPress={() => handleWishlist(item)}
+                    >
+                      <Ionicons
+                        name={
+                          wishlist.includes(item.id)
+                            ? "heart"
+                            : "heart-outline"
+                        }
+                        size={18}
+                        color={
+                          wishlist.includes(item.id)
+                            ? "#FF3B30"
+                            : "#ccc"
+                        }
                       />
-                      {item.badge && (
-                        <View style={styles.cardBadge}>
-                          <Text style={styles.cardBadgeText}>{item.badge}</Text>
-                        </View>
-                      )}
-                      <TouchableOpacity
-                        style={styles.wishBtn}
-                        onPress={() => handleWishlist(item)}
-                      >
-                        <Text
-                          style={[
-                            styles.wishIcon,
-                            {
-                              color: wishlist.includes(item.id)
-                                ? "#FF3B30"
-                                : "#ccc",
-                            },
-                          ]}
-                        >
-                          {wishlist.includes(item.id) ? "♥" : "♡"}
-                        </Text>
-                      </TouchableOpacity>
-                    </View>
-                    <View style={styles.cardBody}>
-                      <Text
-                        style={[styles.cardName, { color: colors.text }]}
-                        numberOfLines={2}
-                      >
-                        {item.name}
-                      </Text>
-                      <View style={styles.cardPriceRow}>
-                        <Text style={styles.cardPrice}>
-                          {formatPrice(item.price)}
-                        </Text>
-                        {item.old_price && (
-                          <Text style={styles.cardOldPrice}>
-                            {formatPrice(item.old_price)}
-                          </Text>
-                        )}
-                      </View>
-                      <Text
-                        style={[styles.cardMeta, { color: colors.subtext }]}
-                      >
-                        ⭐ {item.rating} • Đã bán {item.sold}
+                    </TouchableOpacity>
+
+                    <Text
+                      numberOfLines={2}
+                      style={{ color: colors.text, fontWeight: "600" }}
+                    >
+                      {item.name}
+                    </Text>
+
+                    <Text style={{ color: "#FF3B30", fontWeight: "700" }}>
+                      {formatPrice(item.price)}
+                    </Text>
+
+                    {/* ⭐ */}
+                    <View style={styles.ratingRow}>
+                      <Ionicons name="star" size={12} color="#f5a623" />
+                      <Text style={{ color: colors.subtext }}>
+                        {item.rating} • Đã bán {item.sold}
                       </Text>
                     </View>
                   </TouchableOpacity>
@@ -362,17 +290,20 @@ const CARD_WIDTH = (width - 48) / 2;
 
 const styles = StyleSheet.create({
   root: { flex: 1 },
+
   header: {
     flexDirection: "row",
     justifyContent: "space-between",
-    alignItems: "center",
     paddingHorizontal: 20,
     paddingTop: 55,
     paddingBottom: 12,
   },
+
   hello: { fontSize: 12 },
   brand: { fontSize: 22, fontWeight: "800" },
+
   headerActions: { flexDirection: "row", gap: 8 },
+
   iconBtn: {
     width: 38,
     height: 38,
@@ -380,7 +311,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
-  iconImg: { width: 18, height: 18 },
+
   badge: {
     position: "absolute",
     top: -2,
@@ -392,7 +323,9 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
+
   badgeText: { color: "#fff", fontSize: 9 },
+
   searchWrap: {
     flexDirection: "row",
     margin: 20,
@@ -400,60 +333,73 @@ const styles = StyleSheet.create({
     paddingHorizontal: 14,
     height: 46,
     alignItems: "center",
+    gap: 8,
     borderWidth: 1,
   },
-  searchIcon: { width: 16, height: 16, marginRight: 10 },
+
   searchInput: { flex: 1 },
-  bannerWrap: {
-    marginHorizontal: 20,
-    borderRadius: 20,
-    overflow: "hidden",
+
+  banner: {
+    width: "90%",
     height: 150,
-    marginBottom: 20,
+    alignSelf: "center",
+    borderRadius: 12,
   },
-  bannerImg: { width: "100%", height: "100%", position: "absolute" },
-  bannerContent: { flex: 1, justifyContent: "center", alignItems: "center" },
-  bannerTitle: { color: "#fff", fontSize: 24, fontWeight: "800" },
-  catList: { paddingHorizontal: 20, gap: 8 },
-  catChip: {
+
+  catList: {
     paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 20,
+    gap: 8,
+    marginVertical: 10,
   },
-  catChipActive: { backgroundColor: "#000" },
-  catText: {},
-  catTextActive: { color: "#fff" },
-  secHeader: { paddingHorizontal: 20, marginTop: 16, marginBottom: 14 },
-  secTitle: { fontSize: 18, fontWeight: "800" },
+
+  catChip: {
+    paddingHorizontal: 14,
+    paddingVertical: 6,
+    borderRadius: 20,
+    backgroundColor: "#eee",
+  },
+
+  catChipActive: {
+    backgroundColor: "#000",
+  },
+
+  catText: {
+    fontSize: 12,
+  },
+
+  catTextActive: {
+    color: "#fff",
+  },
+
   grid: {
     flexDirection: "row",
     flexWrap: "wrap",
     paddingHorizontal: 16,
     gap: 12,
   },
+
   card: {
     width: CARD_WIDTH,
     borderRadius: 16,
-    overflow: "hidden",
+    padding: 10,
   },
-  cardImgWrap: { position: "relative" },
-  cardImg: { width: "100%", height: CARD_WIDTH * 0.9 },
-  cardBadge: {
+
+  cardImg: {
+    width: "100%",
+    height: CARD_WIDTH * 0.9,
+    borderRadius: 12,
+  },
+
+  wishBtn: {
     position: "absolute",
-    top: 10,
-    left: 10,
-    backgroundColor: "#FF3B30",
-    paddingHorizontal: 8,
-    paddingVertical: 3,
-    borderRadius: 6,
+    top: 8,
+    right: 8,
   },
-  cardBadgeText: { color: "#fff", fontSize: 10 },
-  wishBtn: { position: "absolute", top: 8, right: 8 },
-  wishIcon: { fontSize: 16 },
-  cardBody: { padding: 10 },
-  cardName: { fontSize: 13, fontWeight: "600" },
-  cardPriceRow: { flexDirection: "row", gap: 6, marginTop: 6 },
-  cardPrice: { color: "#FF3B30", fontWeight: "800" },
-  cardOldPrice: { textDecorationLine: "line-through", color: "#aaa" },
-  cardMeta: { fontSize: 11, marginTop: 6 },
+
+  ratingRow: {
+    flexDirection: "row",
+    gap: 4,
+    alignItems: "center",
+    marginTop: 4,
+  },
 });

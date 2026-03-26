@@ -64,7 +64,7 @@ export const addOrder = async (
     console.log("Lỗi lưu order lên server:", e);
   }
 
-  // Lưu local
+  
   const orders = await getOrders();
   orders.unshift(newOrder);
   await AsyncStorage.setItem(getOrderKey(), JSON.stringify(orders));
@@ -77,7 +77,7 @@ export const cancelOrder = async (id: string): Promise<void> => {
   if (index >= 0) {
     orders[index].status = "cancelled";
 
-    // Cập nhật lên Laravel nếu có serverId
+    
     const serverId = orders[index].serverId;
     if (serverId) {
       try {
@@ -93,7 +93,7 @@ export const cancelOrder = async (id: string): Promise<void> => {
   }
 };
 
-// Sync status từ Laravel về local
+
 export const syncOrderStatus = async (): Promise<void> => {
   const user = auth.currentUser;
   if (!user) return;
@@ -102,7 +102,7 @@ export const syncOrderStatus = async (): Promise<void> => {
     const serverOrders = await fetchAPI(`/orders/user/${user.uid}`);
     const localOrders = await getOrders();
 
-    // Cập nhật status local theo server
+    
     let updated = false;
     localOrders.forEach((localOrder) => {
       if (localOrder.serverId) {

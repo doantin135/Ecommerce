@@ -50,7 +50,7 @@ export const registerForPushNotifications = async (): Promise<string | null> => 
 export const sendOrderNotification = async (orderId: string) => {
   await Notifications.scheduleNotificationAsync({
     content: {
-      title: "🎉 Đặt hàng thành công!",
+      title: " Đặt hàng thành công!",
       body: `Đơn hàng #${orderId} đã được xác nhận. Chúng tôi sẽ giao hàng trong 2-3 ngày.`,
       data: { type: "order", orderId },
     },
@@ -63,7 +63,7 @@ export const sendOrderNotification = async (orderId: string) => {
 export const sendPromoNotification = async (message: string) => {
   await Notifications.scheduleNotificationAsync({
     content: {
-      title: "🔥 Ưu đãi hôm nay!",
+      title: " Ưu đãi hôm nay!",
       body: message,
       data: { type: "promo" },
     },
@@ -76,7 +76,7 @@ export const sendPromoNotification = async (message: string) => {
 export const sendShippingNotification = async (orderId: string) => {
   await Notifications.scheduleNotificationAsync({
     content: {
-      title: "🚚 Đơn hàng đang được giao!",
+      title: "Đơn hàng đang được giao!",
       body: `Đơn hàng #${orderId} đang trên đường đến bạn.`,
       data: { type: "shipping", orderId },
     },

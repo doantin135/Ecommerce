@@ -7,24 +7,44 @@ import {
   StatusBar,
 } from "react-native";
 import { router } from "expo-router";
+import { Ionicons } from "@expo/vector-icons";
 
 export default function OrderSuccessScreen() {
   return (
     <View style={styles.root}>
       <StatusBar barStyle="dark-content" />
       <View style={styles.content}>
-        <Text style={styles.icon}>🎉</Text>
+        <Ionicons name="checkmark-circle" size={80} color="#2ecc71" />
+
         <Text style={styles.title}>Đặt hàng thành công!</Text>
         <Text style={styles.subtitle}>
           Cảm ơn bạn đã mua hàng. Đơn hàng của bạn đang được xử lý.
         </Text>
+
         <View style={styles.infoCard}>
-          <Text style={styles.infoItem}>🚚 Giao hàng trong 2-3 ngày</Text>
-          <Text style={styles.infoItem}>
-            📱 Theo dõi đơn trong mục Đơn hàng
-          </Text>
-          <Text style={styles.infoItem}>💬 Hỗ trợ 24/7 nếu có vấn đề</Text>
+          <View style={styles.infoRow}>
+            <Ionicons name="car-outline" size={18} color="#555" />
+            <Text style={styles.infoItem}> Giao hàng trong 2-3 ngày</Text>
+          </View>
+
+          <View style={styles.infoRow}>
+            <Ionicons name="phone-portrait-outline" size={18} color="#555" />
+            <Text style={styles.infoItem}>
+              {" "}
+              Theo dõi đơn trong mục Đơn hàng
+            </Text>
+          </View>
+
+          <View style={styles.infoRow}>
+            <Ionicons
+              name="chatbubble-ellipses-outline"
+              size={18}
+              color="#555"
+            />
+            <Text style={styles.infoItem}> Hỗ trợ 24/7 nếu có vấn đề</Text>
+          </View>
         </View>
+
         <TouchableOpacity
           style={styles.homeBtn}
           onPress={() => router.replace("/(tabs)")}
@@ -45,7 +65,6 @@ const styles = StyleSheet.create({
     padding: 30,
     gap: 14,
   },
-  icon: { fontSize: 80 },
   title: {
     fontSize: 24,
     fontWeight: "800",
@@ -66,7 +85,16 @@ const styles = StyleSheet.create({
     gap: 12,
     marginTop: 10,
   },
-  infoItem: { fontSize: 14, color: "#444", lineHeight: 22 },
+  infoRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+  },
+  infoItem: {
+    fontSize: 14,
+    color: "#444",
+    lineHeight: 22,
+  },
   homeBtn: {
     backgroundColor: "#3498db",
     paddingHorizontal: 40,

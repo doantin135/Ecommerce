@@ -15,6 +15,7 @@ import { productAPI, categoryAPI } from "../services/api";
 import { getCartCount } from "../services/cartService";
 
 const { width } = Dimensions.get("window");
+const CARD_WIDTH = (width - 48) / 2;
 
 type Category = {
   id: number;
@@ -57,17 +58,11 @@ export default function HomeScreen() {
   };
 
   useEffect(() => {
-    categoryAPI
-      .getAll()
-      .then((data) => setCategories(data))
-      .catch((err) => console.log("Category API error:", err));
+    categoryAPI.getAll().then(setCategories).catch(console.log);
   }, []);
 
   useEffect(() => {
-    productAPI
-      .getAll()
-      .then((data) => setProducts(data))
-      .catch((err) => console.log("Product API error:", err));
+    productAPI.getAll().then(setProducts).catch(console.log);
   }, []);
 
   const filteredProducts =
@@ -78,14 +73,14 @@ export default function HomeScreen() {
   return (
     <View style={styles.root}>
       <StatusBar barStyle="dark-content" />
+
       <View style={styles.header}>
         <View>
-          <Text style={styles.hello}>Xin chào 👋</Text>
+          <Text style={styles.hello}>Xin chào</Text>
           <Text style={styles.brand}>ShopNow</Text>
         </View>
 
         <View style={styles.headerActions}>
-          {/* Thông báo */}
           <TouchableOpacity style={styles.iconBtn}>
             <Image
               style={styles.iconImg}
@@ -95,7 +90,6 @@ export default function HomeScreen() {
             />
           </TouchableOpacity>
 
-          {/* Giỏ hàng */}
           <TouchableOpacity
             style={styles.iconBtn}
             onPress={() => router.push("/Cart")}
@@ -113,7 +107,6 @@ export default function HomeScreen() {
             )}
           </TouchableOpacity>
 
-          {/* User */}
           <TouchableOpacity
             style={styles.iconBtn}
             onPress={() => router.push("/Login")}
@@ -155,7 +148,6 @@ export default function HomeScreen() {
           </View>
         </View>
 
-        {/* Categories */}
         <ScrollView
           horizontal
           showsHorizontalScrollIndicator={false}
@@ -203,7 +195,6 @@ export default function HomeScreen() {
           <Text style={styles.secTitle}>Nổi bật</Text>
         </View>
 
-        {/* Product Grid */}
         <View style={styles.grid}>
           {filteredProducts
             .filter((item) =>
@@ -234,9 +225,14 @@ export default function HomeScreen() {
                     style={styles.wishBtn}
                     onPress={() => toggleWishlist(item.id.toString())}
                   >
-                    <Text style={styles.wishIcon}>
-                      {wishlist.includes(item.id.toString()) ? "♥" : "♡"}
-                    </Text>
+                    <Image
+                      style={styles.wishIcon}
+                      source={{
+                        uri: wishlist.includes(item.id.toString())
+                          ? "https://img.icons8.com/ios-filled/100/like.png"
+                          : "https://img.icons8.com/ios/100/like--v1.png",
+                      }}
+                    />
                   </TouchableOpacity>
                 </View>
 
@@ -256,9 +252,17 @@ export default function HomeScreen() {
                     )}
                   </View>
 
-                  <Text style={styles.cardMeta}>
-                    ⭐ {item.rating} • Đã bán {item.sold}
-                  </Text>
+                  <View style={styles.ratingRow}>
+                    <Image
+                      style={styles.starIcon}
+                      source={{
+                        uri: "https://img.icons8.com/fluency/48/star.png",
+                      }}
+                    />
+                    <Text style={styles.cardMeta}>
+                      {item.rating} • Đã bán {item.sold}
+                    </Text>
+                  </View>
                 </View>
               </TouchableOpacity>
             ))}
@@ -269,8 +273,6 @@ export default function HomeScreen() {
     </View>
   );
 }
-
-const CARD_WIDTH = (width - 48) / 2;
 
 const styles = StyleSheet.create({
   root: { flex: 1, backgroundColor: "#f8f8f8" },
@@ -365,11 +367,18 @@ const styles = StyleSheet.create({
   },
   cardBadgeText: { color: "#fff", fontSize: 10 },
   wishBtn: { position: "absolute", top: 8, right: 8 },
-  wishIcon: { fontSize: 16 },
+  wishIcon: { width: 18, height: 18 },
   cardBody: { padding: 10 },
   cardName: { fontSize: 13, fontWeight: "600" },
   cardPriceRow: { flexDirection: "row", gap: 6, marginTop: 6 },
   cardPrice: { color: "#FF3B30", fontWeight: "800" },
   cardOldPrice: { textDecorationLine: "line-through", color: "#aaa" },
-  cardMeta: { fontSize: 11, color: "#888", marginTop: 6 },
+  ratingRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 4,
+    marginTop: 6,
+  },
+  starIcon: { width: 12, height: 12 },
+  cardMeta: { fontSize: 11, color: "#888" },
 });

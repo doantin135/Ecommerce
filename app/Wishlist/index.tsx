@@ -8,7 +8,6 @@ import {
   TouchableOpacity,
   StatusBar,
   Dimensions,
-  Alert,
 } from "react-native";
 import { router, useFocusEffect } from "expo-router";
 import {
@@ -17,6 +16,7 @@ import {
   removeFromWishlist,
 } from "../../services/wishlistService";
 import { useTheme } from "../../context/ThemeContext";
+import { Ionicons } from "@expo/vector-icons";
 
 const { width } = Dimensions.get("window");
 const CARD_WIDTH = (width - 48) / 2;
@@ -49,23 +49,28 @@ export default function WishlistScreen() {
 
       <View style={[styles.header, { backgroundColor: colors.header }]}>
         <TouchableOpacity style={styles.iconBtn} onPress={() => router.back()}>
-          <Text style={[styles.backIcon, { color: colors.text }]}>←</Text>
+          <Ionicons name="arrow-back" size={20} color={colors.text} />
         </TouchableOpacity>
+
         <Text style={[styles.headerTitle, { color: colors.text }]}>
           Yêu thích ({wishlist.length})
         </Text>
+
         <View style={{ width: 38 }} />
       </View>
 
       {wishlist.length === 0 ? (
         <View style={styles.emptyWrap}>
-          <Text style={styles.emptyIcon}>❤️</Text>
+          <Ionicons name="heart-outline" size={64} color="#ccc" />
+
           <Text style={[styles.emptyTitle, { color: colors.text }]}>
             Chưa có sản phẩm yêu thích
           </Text>
+
           <Text style={[styles.emptySubtitle, { color: colors.subtext }]}>
-            Nhấn ♡ để lưu sản phẩm yêu thích
+            Nhấn biểu tượng trái tim để lưu sản phẩm
           </Text>
+
           <TouchableOpacity
             style={styles.shopBtn}
             onPress={() => router.replace("/(tabs)")}
@@ -90,16 +95,18 @@ export default function WishlistScreen() {
               >
                 <View style={styles.cardImgWrap}>
                   <Image source={{ uri: item.image }} style={styles.cardImg} />
+
                   {item.badge && (
                     <View style={styles.cardBadge}>
                       <Text style={styles.cardBadgeText}>{item.badge}</Text>
                     </View>
                   )}
+
                   <TouchableOpacity
                     style={styles.wishBtn}
                     onPress={() => handleRemove(item.id)}
                   >
-                    <Text style={styles.wishIcon}>♥</Text>
+                    <Ionicons name="heart" size={16} color="#FF3B30" />
                   </TouchableOpacity>
                 </View>
 
@@ -110,23 +117,33 @@ export default function WishlistScreen() {
                   >
                     {item.name}
                   </Text>
+
                   <View style={styles.cardPriceRow}>
                     <Text style={styles.cardPrice}>
                       {formatPrice(item.price)}
                     </Text>
+
                     {item.old_price && (
                       <Text style={styles.cardOldPrice}>
                         {formatPrice(item.old_price)}
                       </Text>
                     )}
                   </View>
-                  <Text style={[styles.cardMeta, { color: colors.subtext }]}>
-                    ⭐ {item.rating} • Đã bán {item.sold}
-                  </Text>
+
+                  <View style={styles.metaRow}>
+                    <Ionicons name="star" size={12} color="#f39c12" />
+                    <Text style={[styles.cardMeta, { color: colors.subtext }]}>
+                      {item.rating}
+                    </Text>
+                    <Text style={[styles.cardMeta, { color: colors.subtext }]}>
+                      • Đã bán {item.sold}
+                    </Text>
+                  </View>
                 </View>
               </TouchableOpacity>
             ))}
           </View>
+
           <View style={{ height: 30 }} />
         </ScrollView>
       )}
@@ -136,6 +153,7 @@ export default function WishlistScreen() {
 
 const styles = StyleSheet.create({
   root: { flex: 1 },
+
   header: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -144,6 +162,7 @@ const styles = StyleSheet.create({
     paddingTop: 55,
     paddingBottom: 12,
   },
+
   iconBtn: {
     width: 38,
     height: 38,
@@ -152,8 +171,9 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
-  backIcon: { fontSize: 20 },
+
   headerTitle: { fontSize: 16, fontWeight: "700" },
+
   emptyWrap: {
     flex: 1,
     justifyContent: "center",
@@ -161,9 +181,11 @@ const styles = StyleSheet.create({
     gap: 10,
     padding: 30,
   },
-  emptyIcon: { fontSize: 64 },
+
   emptyTitle: { fontSize: 18, fontWeight: "700" },
+
   emptySubtitle: { fontSize: 14, textAlign: "center" },
+
   shopBtn: {
     marginTop: 10,
     backgroundColor: "#3498db",
@@ -171,7 +193,9 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     borderRadius: 14,
   },
+
   shopBtnText: { color: "#fff", fontWeight: "700", fontSize: 15 },
+
   grid: {
     flexDirection: "row",
     flexWrap: "wrap",
@@ -179,13 +203,17 @@ const styles = StyleSheet.create({
     paddingTop: 16,
     gap: 12,
   },
+
   card: {
     width: CARD_WIDTH,
     borderRadius: 16,
     overflow: "hidden",
   },
+
   cardImgWrap: { position: "relative" },
+
   cardImg: { width: "100%", height: CARD_WIDTH * 0.9 },
+
   cardBadge: {
     position: "absolute",
     top: 10,
@@ -195,7 +223,9 @@ const styles = StyleSheet.create({
     paddingVertical: 3,
     borderRadius: 6,
   },
+
   cardBadgeText: { color: "#fff", fontSize: 10, fontWeight: "800" },
+
   wishBtn: {
     position: "absolute",
     top: 8,
@@ -207,11 +237,23 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
-  wishIcon: { fontSize: 16, color: "#FF3B30" },
+
   cardBody: { padding: 10 },
+
   cardName: { fontSize: 13, fontWeight: "600" },
+
   cardPriceRow: { flexDirection: "row", gap: 6, marginTop: 6 },
+
   cardPrice: { color: "#FF3B30", fontWeight: "800" },
+
   cardOldPrice: { textDecorationLine: "line-through", color: "#aaa" },
-  cardMeta: { fontSize: 11, marginTop: 6 },
+
+  metaRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 4,
+    marginTop: 6,
+  },
+
+  cardMeta: { fontSize: 11 },
 });

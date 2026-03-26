@@ -17,6 +17,7 @@ import {
   removeFromCart,
   clearCart,
 } from "../../services/cartService";
+import { Ionicons } from "@expo/vector-icons";
 
 export default function CartScreen() {
   const [cart, setCart] = useState<CartItem[]>([]);
@@ -28,6 +29,7 @@ export default function CartScreen() {
   );
 
   const handleUpdateQty = async (id: number, qty: number) => {
+    if (qty <= 0) return;
     await updateQuantity(id, qty);
     getCart().then(setCart);
   };
@@ -77,12 +79,13 @@ export default function CartScreen() {
     <View style={styles.root}>
       <StatusBar barStyle="dark-content" />
 
-      {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity style={styles.iconBtn} onPress={() => router.back()}>
-          <Text style={styles.backIcon}>←</Text>
+          <Ionicons name="arrow-back" size={20} color="#333" />
         </TouchableOpacity>
+
         <Text style={styles.headerTitle}>Giỏ hàng ({cart.length})</Text>
+
         {cart.length > 0 ? (
           <TouchableOpacity onPress={handleClear}>
             <Text style={styles.clearText}>Xóa hết</Text>
@@ -93,13 +96,13 @@ export default function CartScreen() {
       </View>
 
       {cart.length === 0 ? (
-        // Giỏ hàng trống
         <View style={styles.emptyWrap}>
-          <Text style={styles.emptyIcon}>🛒</Text>
+          <Ionicons name="cart-outline" size={64} color="#ccc" />
           <Text style={styles.emptyTitle}>Giỏ hàng trống</Text>
           <Text style={styles.emptySubtitle}>
             Hãy thêm sản phẩm vào giỏ nhé!
           </Text>
+
           <TouchableOpacity
             style={styles.shopBtn}
             onPress={() => router.navigate("/(tabs)")}
@@ -113,13 +116,16 @@ export default function CartScreen() {
             {cart.map((item) => (
               <View key={item.id} style={styles.cartItem}>
                 <Image source={{ uri: item.image }} style={styles.itemImg} />
+
                 <View style={styles.itemInfo}>
                   <Text style={styles.itemName} numberOfLines={2}>
                     {item.name}
                   </Text>
+
                   <Text style={styles.itemPrice}>
                     {formatPrice(item.price)}
                   </Text>
+
                   <View style={styles.qtyRow}>
                     <TouchableOpacity
                       style={styles.qtyBtn}
@@ -127,41 +133,46 @@ export default function CartScreen() {
                         handleUpdateQty(item.id, item.quantity - 1)
                       }
                     >
-                      <Text style={styles.qtyBtnText}>−</Text>
+                      <Ionicons name="remove" size={16} color="#333" />
                     </TouchableOpacity>
+
                     <Text style={styles.qtyValue}>{item.quantity}</Text>
+
                     <TouchableOpacity
                       style={styles.qtyBtn}
                       onPress={() =>
                         handleUpdateQty(item.id, item.quantity + 1)
                       }
                     >
-                      <Text style={styles.qtyBtnText}>+</Text>
+                      <Ionicons name="add" size={16} color="#333" />
                     </TouchableOpacity>
                   </View>
                 </View>
+
                 <View style={styles.itemRight}>
                   <TouchableOpacity
                     style={styles.removeBtn}
                     onPress={() => handleRemove(item.id)}
                   >
-                    <Text style={styles.removeIcon}>🗑</Text>
+                    <Ionicons name="trash-outline" size={18} color="#e74c3c" />
                   </TouchableOpacity>
+
                   <Text style={styles.itemTotal}>
                     {formatPrice(item.price * item.quantity)}
                   </Text>
                 </View>
               </View>
             ))}
+
             <View style={{ height: 120 }} />
           </ScrollView>
 
-          {/* Bottom Bar */}
           <View style={styles.bottomBar}>
             <View style={styles.totalRow}>
               <Text style={styles.totalLabel}>Tổng tiền:</Text>
               <Text style={styles.totalValue}>{formatPrice(total)}</Text>
             </View>
+
             <TouchableOpacity
               style={styles.checkoutBtn}
               onPress={() => router.push("/Checkout")}
@@ -179,6 +190,7 @@ export default function CartScreen() {
 
 const styles = StyleSheet.create({
   root: { flex: 1, backgroundColor: "#f8f8f8" },
+
   header: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -188,6 +200,7 @@ const styles = StyleSheet.create({
     paddingBottom: 12,
     backgroundColor: "#fff",
   },
+
   iconBtn: {
     width: 38,
     height: 38,
@@ -196,8 +209,9 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
-  backIcon: { fontSize: 20, color: "#333" },
+
   headerTitle: { fontSize: 16, fontWeight: "700" },
+
   clearText: { color: "#FF3B30", fontSize: 14, fontWeight: "600" },
 
   emptyWrap: {
@@ -206,9 +220,11 @@ const styles = StyleSheet.create({
     alignItems: "center",
     gap: 10,
   },
-  emptyIcon: { fontSize: 64 },
+
   emptyTitle: { fontSize: 20, fontWeight: "700", color: "#1a1a1a" },
+
   emptySubtitle: { fontSize: 14, color: "#888" },
+
   shopBtn: {
     marginTop: 10,
     backgroundColor: "#3498db",
@@ -216,6 +232,7 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     borderRadius: 14,
   },
+
   shopBtnText: { color: "#fff", fontWeight: "700", fontSize: 15 },
 
   cartItem: {
@@ -227,16 +244,27 @@ const styles = StyleSheet.create({
     padding: 12,
     gap: 12,
   },
+
   itemImg: {
     width: 80,
     height: 80,
     borderRadius: 12,
     backgroundColor: "#f0f0f0",
   },
+
   itemInfo: { flex: 1, gap: 4 },
+
   itemName: { fontSize: 13, fontWeight: "600", color: "#1a1a1a" },
+
   itemPrice: { fontSize: 13, color: "#FF3B30", fontWeight: "700" },
-  qtyRow: { flexDirection: "row", alignItems: "center", gap: 10, marginTop: 4 },
+
+  qtyRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 10,
+    marginTop: 4,
+  },
+
   qtyBtn: {
     width: 28,
     height: 28,
@@ -245,19 +273,21 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
-  qtyBtnText: { fontSize: 16, fontWeight: "600", color: "#333" },
+
   qtyValue: {
     fontSize: 15,
     fontWeight: "700",
     minWidth: 20,
     textAlign: "center",
   },
+
   itemRight: {
     alignItems: "flex-end",
     justifyContent: "space-between",
   },
+
   removeBtn: { padding: 4 },
-  removeIcon: { fontSize: 18 },
+
   itemTotal: { fontSize: 13, fontWeight: "700", color: "#1a1a1a" },
 
   bottomBar: {
@@ -272,13 +302,17 @@ const styles = StyleSheet.create({
     borderColor: "#f0f0f0",
     gap: 12,
   },
+
   totalRow: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
   },
+
   totalLabel: { fontSize: 15, color: "#888" },
+
   totalValue: { fontSize: 20, fontWeight: "800", color: "#FF3B30" },
+
   checkoutBtn: {
     backgroundColor: "#3498db",
     height: 52,
@@ -286,5 +320,6 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
+
   checkoutBtnText: { color: "#fff", fontWeight: "700", fontSize: 16 },
 });
